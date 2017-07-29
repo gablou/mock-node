@@ -108,7 +108,7 @@ let decodeRoutePath = (route) => route.replace(/!/g, "/");
 // Creators and assigners - subtle abstraction : These return middlewares
 let createProxyRoute = (route, target) => router.use(route, assignNewProxy(target));
 
-let createStubRoute = (route, stub) => router.use(route, stubHandler(route, stub));
+let createStubRoute = (route, stub, code) => router.use(route, stubHandler(route, stub, code));
 
 let createDynamicStubRoute = (route, dynamicStub) => router.use(route, dynamicStubHandler(route, dynamicStub));
 
@@ -130,7 +130,7 @@ let dynamicStubHandler = (_route, _name) => {
 }
 
 // Middleware which returns a stub
-let stubHandler = (route, stub) => (req, res, next) => res.sendFile(path.join(__dirname, 'stubs', encodeRoutePath(route), stub));
+let stubHandler = (route, stub, code = 200) => (req, res, next) => res.status(code).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(route), stub));
 
 // Middleware which handles the dynamic stubs conditions
 // Uses sandcastle to execute evals on a node sanbox.
@@ -451,7 +451,10 @@ config.routes.filter((configObj) => configObj.handle == "proxy")
              .map((configObj) => createProxyRoute(configObj.route, configObj.proxy));
 
 config.routes.filter((configObj) => configObj.handle == "stub")
-             .map((configObj) => createStubRoute(configObj.route, configObj.stub));
+             .map((configObj) => {
+               const stubConf = configObj.stubs.find((elem) => (elem.name === configObj.stub));
+               createStubRoute(configObj.route, configObj.stub, stubConf ? stubConf.code : undefined) 
+             });
 
 config.routes.filter((configObj) => configObj.handle == "dynamicStub")
              .map((configObj) => createDynamicStubRoute(configObj.route, configObj.dynamicStub));

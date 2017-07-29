@@ -73,12 +73,17 @@
       "route": "/index/",
       "handle": "stub",
       "proxy": "http://localhost:8090",
-      "stub": "index.xml",
+      "stub": "error.html",
       "dynamicStub": "",
       "stubs": [
         {
           "name": "index.html",
           "description": "You can even stub html files"
+        },
+        {
+          "name": "error.html",
+          "code": 403,
+          "description": "an error page with it's error code"
         },
         {
           "name": "index.xml",
