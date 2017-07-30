@@ -400,7 +400,7 @@ router.use('/mocknode/api', (req, res, next) => {
   next();
 });
 
-
+app.get('/', (req, res) => res.redirect(301, '/mocknode'));
 router.use('/mocknode', express.static(interfaceFolder));
 router.use('/mocknode/api/config', (req, res) => res.json(config));
 
