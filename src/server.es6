@@ -121,6 +121,7 @@ let dynamicStubHandler = (_route, _name) => {
       for (var j = 0; j < config.routes[i].dynamicStubs.length; j++) {
         if (config.routes[i].dynamicStubs[j].name == _name) {
           dynamicObj = config.routes[i].dynamicStubs[j];
+          dynamicObj.stubs = config.routes[i].stubs;
           break configLoop;
         }
       };
@@ -139,8 +140,7 @@ let stubHandler = (route, stub, code = 200) => (req, res, next) => res.status(co
 let dynamicStubRequestHandler = (_route, _stub) => {
   return (req, res) => {
     let returnedStub = _stub.defaultStub,
-        continueLoop = true,
-        count = 0;
+        code = 200;
 
     _stub.conditions.every((condition) => {
       if(eval(condition.eval)) {
@@ -203,7 +203,11 @@ let dynamicStubRequestHandler = (_route, _stub) => {
       // );
     // }
     // else {
-      res.sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
+      const stubDetails = _stub.stubs.find((stub) => (stub.name === returnedStub));
+      if( stubDetails && stubDetails.code ) {
+        code = stubDetails.code;
+      }
+      res.status(code).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
     // }
   }
 }

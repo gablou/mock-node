@@ -107,7 +107,8 @@
         },
         {
           "name": "ambiguous.json",
-          "description": "ambiguous"
+          "code": 418,
+          "description": "ambiguous teapot"
         }
       ],
       "dynamicStubs": [
