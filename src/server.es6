@@ -121,7 +121,6 @@ let dynamicStubHandler = (_route, _name) => {
       for (var j = 0; j < config.routes[i].dynamicStubs.length; j++) {
         if (config.routes[i].dynamicStubs[j].name == _name) {
           dynamicObj = config.routes[i].dynamicStubs[j];
-          dynamicObj.stubs = config.routes[i].stubs;
           break configLoop;
         }
       };
@@ -143,8 +142,7 @@ let stubHandler = (_route, _stub) => (req, res, next) => {
 // runtime, so the eval expressions can access the req object.
 let dynamicStubRequestHandler = (_route, _stub) => {
   return (req, res) => {
-    let returnedStub = _stub.defaultStub,
-        code = 200;
+    let returnedStub = _stub.defaultStub;
 
     _stub.conditions.every((condition) => {
       if(eval(condition.eval)) {
@@ -207,10 +205,8 @@ let dynamicStubRequestHandler = (_route, _stub) => {
       // );
     // }
     // else {
-      const stubDetails = _stub.stubs.find((stub) => (stub.name === returnedStub));
-      if( stubDetails && stubDetails.code ) {
-        code = stubDetails.code;
-      }
+      const stubConf = (config.routes.find((route) => (route.route === _route))).stubs.find((stub) => (stub.name === returnedStub));
+      const code = stubConf.code || 200
       res.status(code).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
     // }
   }
