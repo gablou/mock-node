@@ -142,62 +142,69 @@ let dynamicStubRequestHandler = (_route, _stub) => {
         continueLoop = true,
         count = 0;
 
-    if (_stub.conditions.length) {
-      async.whilst(
-        () => (count < _stub.conditions.length) && continueLoop,
-        (callback) => {
-          let script = sandcastle.createScript(`exports.main = function() {
-            try {
-              if (${_stub.conditions[count].eval})
-                exit('${_stub.conditions[count].stub}')
-              else
-                exit(false)
-            } catch(e) {
-              exit(false)
-            }
-          }`);
+    _stub.conditions.every((condition) => {
+      if(eval(condition.eval)) {
+        returnedStub = condition.stub;
+        return false; // stop looping
+      }
+      return true; // continue looking for a match
+    });
+    // if (_stub.conditions.length) {
+      // async.whilst(
+      //   () => (count < _stub.conditions.length) && continueLoop,
+      //   (callback) => {
+      //     let script = sandcastle.createScript(`exports.main = function() {
+      //       try {
+      //         if (${_stub.conditions[count].eval})
+      //           exit('${_stub.conditions[count].stub}')
+      //         else
+      //           exit(false)
+      //       } catch(e) {
+      //         exit(false)
+      //       }
+      //     }`);
 
-          count++;
+      //     count++;
 
-          script.on('exit', function(err, output) {
-            if (output) {
-              continueLoop = false
-              returnedStub = output
-            }
-            callback();
-          });
+      //     script.on('exit', function(err, output) {
+      //       if (output) {
+      //         continueLoop = false
+      //         returnedStub = output
+      //       }
+      //       callback();
+      //     });
 
-          script.run({
-            req: assign({}, {
-              baseURL: req.baseURL,
-              body: req.body,
-              cookies: req.cookies,
-              headers: req.headers,
-              hostname: req.hostname,
-              ip: req.ip,
-              ips: req.ips,
-              method: req.method,
-              originalUrl: req.originalUrl,
-              params: req.params,
-              path: req.path,
-              protocol: req.protocol,
-              query: req.query,
-              route: req.route,
-              signedCookies: req.signedCookies,
-              stale: req.stale,
-              subdomains: req.subdomains,
-              xhr: req.xhr
-            })
-          });
-        },
-        (err) => {
-          res.sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
-        }
-      );
-    }
-    else {
+      //     script.run({
+      //       req: assign({}, {
+      //         baseURL: req.baseURL,
+      //         body: req.body,
+      //         cookies: req.cookies,
+      //         headers: req.headers,
+      //         hostname: req.hostname,
+      //         ip: req.ip,
+      //         ips: req.ips,
+      //         method: req.method,
+      //         originalUrl: req.originalUrl,
+      //         params: req.params,
+      //         path: req.path,
+      //         protocol: req.protocol,
+      //         query: req.query,
+      //         route: req.route,
+      //         signedCookies: req.signedCookies,
+      //         stale: req.stale,
+      //         subdomains: req.subdomains,
+      //         xhr: req.xhr
+      //       })
+      //     });
+      //   },
+      //   (err) => {
+      //     res.sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
+      //   }
+      // );
+    // }
+    // else {
       res.sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
-    }
+    // }
   }
 }
 
