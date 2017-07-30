@@ -73,7 +73,7 @@
       "route": "/index/",
       "handle": "stub",
       "proxy": "http://localhost:8090",
-      "stub": "error.html",
+      "stub": "index.html",
       "dynamicStub": "",
       "stubs": [
         {
