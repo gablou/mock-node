@@ -129,11 +129,14 @@ let dynamicStubHandler = (_route, _name) => {
   return dynamicStubRequestHandler(_route, dynamicObj);
 }
 
+let getStubSatusCode = (_route, _stub) => {
+  const stubConf = (config.routes.find((route) => (route.route === _route))).stubs.find((stub) => (stub.name === _stub));
+ return stubConf.code || 200;
+}
+
 // Middleware which returns a stub
 let stubHandler = (_route, _stub) => (req, res, next) => {
-  const stubConf = (config.routes.find((route) => (route.route === _route))).stubs.find((stub) => (stub.name === _stub));
-  const code = stubConf.code || 200;
-  return res.status(code).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), _stub));
+  return res.status(getStubSatusCode(_route, _stub)).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), _stub));
 }
 
 // Middleware which handles the dynamic stubs conditions
@@ -205,9 +208,7 @@ let dynamicStubRequestHandler = (_route, _stub) => {
       // );
     // }
     // else {
-      const stubConf = (config.routes.find((route) => (route.route === _route))).stubs.find((stub) => (stub.name === returnedStub));
-      const code = stubConf.code || 200
-      res.status(code).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
+      res.status(getStubSatusCode(_route, returnedStub)).sendFile(path.join(__dirname, 'stubs', encodeRoutePath(_route), returnedStub));
     // }
   }
 }
