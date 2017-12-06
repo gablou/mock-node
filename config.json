@@ -88,6 +88,13 @@
         {
           "name": "index.xml",
           "description": "This is an example xml file"
+        },
+        {
+          "name": "download.xml",
+          "description": "This is an example xml file to dowwnload",
+          "headers": {
+            "Content-Disposition": "attachment; filename=\"download.xml\""
+          }
         }
       ],
       "dynamicStubs": []
@@ -109,6 +116,13 @@
           "name": "ambiguous.json",
           "code": 418,
           "description": "ambiguous teapot"
+        },
+        {
+          "name": "ambiguousDownload.json",
+          "headers": {
+            "Content-Disposition": "attachment; filename=\"ambiguousDownload.json\""
+          },
+          "description": "ambiguous download"
         }
       ],
       "dynamicStubs": [
@@ -117,6 +131,10 @@
           "description": "its a dynamic stub",
           "defaultStub": "ambiguous.json",
           "conditions": [
+            {
+              "eval": "req.query.return == \"download\"",
+              "stub": "ambiguousDownload.json"
+            },
             {
               "eval": "req.query.return == \"true\"",
               "stub": "true.json"
